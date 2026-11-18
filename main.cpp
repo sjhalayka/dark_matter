@@ -245,7 +245,7 @@ static const double SUN_LINES = PI * SUN_RS_PLANCK * SUN_RS_PLANCK / 0.693147180
 
 struct Params {
 	double n = 1e4;
-	int N[3] = { 200, 200, 200 };              // cells per axis
+	int N[3] = { 250, 250, 250 };              // cells per axis
 	bool gridAuto = true;                      // one --grid value: cells along longest axis, others proportional
 	double margin[3] = { 6.0, 6.0, 6.0 };      // box half-size in emitter radii (x: beyond D / Rg)
 	double seg = 10;
@@ -258,11 +258,11 @@ struct Params {
 	size_t maxDisplay = size_t(1) << 21;  // approx. segments sent to the display
 	std::string swapDir = ".";
 	Model model = QUANTUM;
-	double highlight = 16;
+	double highlight = 0.25;// 16;
 	bool cpu = false;                     // force the CPU grid solver
 	bool endAtEmitters = false;           // true: a line stops where it enters another emitter
 
-	Mode mode = SUN;                   // SINGLE, TWO, GALAXY or SUN
+	Mode mode = SINGLE;                   // SINGLE, TWO, GALAXY or SUN
 
 	// ---- galaxy mode
 	int emitters = 1000;                   // number of emitters in the galaxy
@@ -386,7 +386,7 @@ public:
 
 	inline size_t ID(int i, int j, int k) const { return (size_t)i + (size_t)Nx * (size_t)j + NXY * (size_t)k; }
 
-	const double separation = 2.5;
+	const double separation = 20.5;
 
 	explicit Sim(const Params& p) : P(p)
 	{
