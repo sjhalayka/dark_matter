@@ -49,9 +49,7 @@
 \setlist{itemsep=2pt,topsep=4pt}
 \setlength{\parskip}{3pt}
 
-\title{\textbf{Self-Interacting Gravitating Field Lines}\\[4pt]
-\large Technical documentation of \texttt{main.cpp}: algorithms, physical model,\\
-and the \GALAXY\ and \SUN\ simulation modes}
+\title{\textbf{Dark matter from self-interacting gravitating field lines}\\[4pt]}
 \author{}
 \date{}
 
@@ -59,16 +57,13 @@ and the \GALAXY\ and \SUN\ simulation modes}
 \maketitle
 
 \begin{abstract}
-\noindent
-This document describes a C++/OpenGL program that simulates gravitational
-\emph{field lines} which are themselves sources of gravity. Every emitter
-(a star, a galaxy member, or the Sun) sends out a fixed number of field lines.
+This document describes a C++/OpenGL program that simulates gravitational \emph{field lines}, which are themselves sources of gravity. 
 The lines are deposited onto a 3D grid as a mass density, the Poisson equation
 is solved for the potential, and the resulting gravitational acceleration
 bends the same lines in the next step. The field therefore acts back on the
 lines that produce it: gravity is \emph{self-interacting}. The program offers
 four modes. This document concentrates on the self-interaction loop and on
-the two modes that differ most, \GALAXY\ (many emitters, normalised bending, rotation curves)
+the two modes that differ most, \GALAXY\ (many emitters, normalized bending, rotation curves)
 and \SUN\ (one body at physical scale, interior chords, physical bending and
 mass measurement). All procedures are given as algorithms rather than source code.
 \end{abstract}
@@ -82,7 +77,7 @@ mass measurement). All procedures are given as algorithms rather than source cod
 
 The program (\url{https://github.com/sjhalayka/dark_matter}) 
 simulates many different scenes. is a single translation unit of 
-about 2\,100 lines. It splits into five functional layers:
+about 2100 lines. It splits into five functional layers:
 
 \begin{enumerate}
   \item \textbf{Geometry and encoding.} A small vector type, a 16-byte packed
@@ -98,7 +93,7 @@ about 2\,100 lines. It splits into five functional layers:
   \item \textbf{Diagnostics.} Rotation curves (all modes) and, in \SUN\ mode only,
         a mass measurement from chord statistics, light deflection, Shapiro delay
         and Gauss's law.
-  \item \textbf{Visualisation.} Line clouds, highlighted lines, a ray-marched
+  \item \textbf{Visualization.} Line clouds, highlighted lines, a ray-marched
         density volume, exterior field streamlines (\SUN), PNG screenshots and
         an interactive camera.
 \end{enumerate}
@@ -158,7 +153,7 @@ floats. The direction uses \emph{octahedral encoding}, compressed to two signed
 \Function{Unpack}{$\vect p, o_0, o_1$}
   \State $x\gets o_0/32767$, $y\gets o_1/32767$, $z\gets 1-|x|-|y|$, $t\gets\max(-z,0)$
   \State $x \gets x - t\,\mathrm{sgn}(x)$; \quad $y\gets y - t\,\mathrm{sgn}(y)$
-  \State \Return $(\vect p,\ \mathrm{normalise}(x,y,z))$
+  \State \Return $(\vect p,\ \mathrm{normalize}(x,y,z))$
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
@@ -222,7 +217,7 @@ from all lines together. Figure~\ref{fig:cycle} shows the cycle.
 \draw[arr] (kick) -- (dep);
 \draw[arr] (dep) -- (pois);
 \draw[arr] (pois) -- node[left,align=center,font=\small]{next step\\$k\to k+1$} (rebuild);
-\node[font=\small,align=center,text width=4cm] at ($(rebuild)!0.5!(dep)$) {lines are both\\\textbf{source} and\\\textbf{test particle}};
+\node[font=\small,align=center,text width=4cm] at ($(rebuild)!0.5!(dep)$) {};
 \end{tikzpicture}
 \caption{One step of the self-interacting field-line simulation. The field
 used to bend the lines in step $k$ comes from the lines of step $k-1$, which is an
@@ -322,7 +317,7 @@ store is on disk.
 \For{$j=0$ \textbf{to} $\min(m,\ \text{maxChain}-1)-1$}
    \State $(\vect q,\vect v)\gets$ \Call{Unpack}{old node $j$}
    \If{$\kappa\neq0$} \Comment{\textbf{self-interaction: the lines' own field bends them}}
-      \State $\vect v\gets \mathrm{normalise}\big(\vect v + \kappa\,\vect g(\vect q)\big)$ \Comment{$\vect g$ by CIC interpolation}
+      \State $\vect v\gets \mathrm{normalize}\big(\vect v + \kappa\,\vect g(\vect q)\big)$ \Comment{$\vect g$ by CIC interpolation}
    \EndIf
    \State $\vect p' \gets \vect p + \ell\,\vect v$ \Comment{attach to inner neighbour}
    \State $\beta\gets\arccos(\vect v\cdot\vect v_\text{prev})$ \Comment{bend angle, for colouring}
@@ -427,11 +422,11 @@ directions of the lines, decides the shape of the halo, the rotation curve
 (Section~\ref{sec:mass}).
 \end{corebox}
 
-\subsection{Bending strength: normalised versus physical}
+\subsection{Bending strength: normalized versus physical}
 
 The factor $\kappa$ in Algorithm~\ref{alg:line} has two possible meanings:
 \begin{description}
-  \item[Normalised (\SINGLE, \TWO, \GALAXY, and \SUN\ with \opt{strength}).]
+  \item[Normalized (\SINGLE, \TWO, \GALAXY, and \SUN\ with \opt{strength}).]
      $\kappa = s/g_\text{ref}$. Where the field is strongest, a direction
      turns by about $s$ radians per step (default $s=\ell/100=0.1$). Elsewhere the turn
      scales with $|\vect g|/g_\text{ref}$. This controls the \emph{shape}
@@ -459,15 +454,15 @@ Its initial direction depends on the mode and on \opt{model}.
 \State $h_2,h_3,h_4\gets$ successive hashes of $h_1$
 \State $\vect s_1\gets$\Call{UnitSphere}{$h_1,h_2$}; \quad $\vect p\gets\vect c_e+R\,\vect s_1$
 \If{mode $=$ \SUN} \Comment{interior chord}
-   \State $\vect s_2\gets$\Call{UnitSphere}{$h_3,h_4$}; \quad $\vect d\gets\mathrm{normalise}(\vect s_2-\vect s_1)$
+   \State $\vect s_2\gets$\Call{UnitSphere}{$h_3,h_4$}; \quad $\vect d\gets\mathrm{normalize}(\vect s_2-\vect s_1)$
    \State \Return $(\vect p,\vect d)$ \Comment{\opt{model} is ignored}
 \EndIf
 \If{\opt{model} $=$ newton} $\vect d\gets\vect s_1$ \Comment{purely radial}
 \ElsIf{\opt{model} $=$ classical} \Comment{cosine-weighted (Lambertian) about the normal}
    \State build an orthonormal frame $(\vect u,\vect w,\vect s_1)$; $r\gets\sqrt{u_4}$, $\varphi\gets 2\pi u_3$
-   \State $\vect d\gets \mathrm{normalise}(r\cos\varphi\,\vect u + r\sin\varphi\,\vect w + \sqrt{1-u_4}\,\vect s_1)$
+   \State $\vect d\gets \mathrm{normalize}(r\cos\varphi\,\vect u + r\sin\varphi\,\vect w + \sqrt{1-u_4}\,\vect s_1)$
 \Else \Comment{quantum (default): outward continuation of a random chord}
-   \State $\vect s_2\gets$\Call{UnitSphere}{$h_3,h_4$}; \quad $\vect d\gets\mathrm{normalise}(\vect s_1-\vect s_2)$
+   \State $\vect s_2\gets$\Call{UnitSphere}{$h_3,h_4$}; \quad $\vect d\gets\mathrm{normalize}(\vect s_1-\vect s_2)$
 \EndIf
 \State \Return $(\vect p,\vect d)$
 \end{algorithmic}
@@ -491,11 +486,11 @@ interior mass distribution.
 \toprule
 & \SINGLE & \TWO & \GALAXY & \SUN \\
 \midrule
-Emitters & 1 at origin & 2 at $\pm20.5R$ on $x$ & $\sim$\opt{emitters} (1000) & 1 at origin \\
+Emitters & 1 at origin & 2 at $\pm20.5R$ on $x$ & \opt{emitters} (1000) & 1 at origin \\
 Box half-size & margin$\cdot R$ & $x$: $D+$margin$\cdot R$ & $R_g+$margin$\cdot R$ & margin$\cdot R$ \\
 Lines leave & outward & outward & outward & \emph{inward} \\
 Line ends & box & box & box (or emitter) & body surface \\
-Bending & normalised & normalised & normalised & physical \\
+Bending & normalized & normalized & normalized & physical \\
 \bottomrule
 \end{tabular}
 \caption{Summary of the four modes, chosen with \opt{single}, \opt{two}, \opt{galaxy} or \opt{sun}.}
@@ -518,7 +513,7 @@ into one density grid and are bent by one shared field. The lines of one
 emitter are therefore bent by the combined halo of all emitters and by their own. The question
 the mode asks is whether the field-line halo of a disk of sources gives a
 \emph{flat rotation curve}, as observed in real galaxies, rather than the
-Keplerian fall-off $v\propto r^{-1/2}$.
+Keplerian fall-off $v\propto r^{-0.5}$. The answer is yes, it produces a flat rotation curve.
 \end{galaxybox}
 
 \paragraph{Geometry.}
@@ -583,7 +578,7 @@ bits of $e$, so emitters $e$ and $e+4$ would emit identical line bundles. The
 galaxy hash keeps every emitter's lines independent.
 
 \paragraph{Dynamics.}
-Bending is always normalised: the strongest field in the box (usually near
+Bending is always normalized: the strongest field in the box (usually near
 the bulge) turns lines by \opt{strength} radians per step. The colour of a line can show
 either its bend angle or its emitter index (key \texttt{c}). The emitter index runs
 from orange to blue. When many emitters are shown, the wireframe spheres are drawn
@@ -606,7 +601,8 @@ starting on the surface, running inward and ending on the far surface. Their
 line length makes up the Sun's mass. Their Poisson field bends them
 with the physical general-relativistic factor. Diagnostics then test whether
 the field-line mass reproduces one solar mass. Lines never leave the body, so
-the exterior field comes entirely from the solver (Gauss's law).
+the exterior field comes entirely from the solver (Gauss's law), resulting in the
+recovery of Keplerian dynamics.
 \end{sunbox}
 
 \paragraph{Scaling to the real Sun.}
@@ -628,7 +624,7 @@ In these units $R_s=\sqrt{n\ln2/\pi}$ (the same as Eq.~\eqref{eq:radius}), while
 body radius is $R=R_\odot/u$, which is $R_\odot/R_{s,\odot}\approx2.356\times10^{5}$ times larger. For $n=10^4$:
 $R_s\approx46.97$, $R\approx1.107\times10^{7}$.
 
-\paragraph{Mass normalisation.}
+\paragraph{Mass normalization.}
 For uniform random chords of a unit sphere, the mean chord length is
 $\langle l\rangle=4/3$ exactly. With chord length $2\sin(\theta/2)$ and
 $\theta$ distributed as $\tfrac12\sin\theta$,
@@ -718,11 +714,11 @@ aimed chord length $2R|\vect s_1\cdot\vect d_0|$.
 \end{algorithm}
 
 The source code points out a caveat that should be stated clearly. $M_\text{chord}=1$
-holds for \emph{any} uniform set of straight chords, so it is a normalisation and not
+holds for \emph{any} uniform set of straight chords, so it is a normalization and not
 a measurement. Bending changes it only at second order, about $10^{-11}$ for the Sun. The
 quantities that actually test anything are the first-order observables, the deflection and
 Shapiro ratios. They depend on the field that the chords themselves produce, and grid
-discretisation biases them by a few cells per $R$.
+discretization biases them by a few cells per $R$.
 
 \begin{algorithm}[htbp]
 \caption{\textsc{BuildFieldLines} --- exterior streamlines for display (\SUN)}
@@ -740,40 +736,8 @@ discretisation biases them by a few cells per $R$.
 \end{algorithmic}
 \end{algorithm}
 
-% ------------------------------------------------------------------
-\subsection{GALAXY versus SUN: side-by-side}
-\label{sec:compare}
-% ------------------------------------------------------------------
 
-{\small
-\renewcommand{\arraystretch}{1.25}
-\begin{longtable}{@{}>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}p{5.9cm}>{\raggedright\arraybackslash}p{5.9cm}@{}}
-\toprule
-\textbf{Aspect} & \GALAXY & \SUN \\
-\midrule
-\endhead
-Purpose & Rotation curve of a self-gravitating disk of sources; looks for flat curves & Check whether field-line mass reproduces $1\,M_\odot$ at real scale \\
-Emitters & Up to \opt{emitters} (1000), spiral disk and bulge & Exactly one, at the origin \\
-Length unit & Planck length & $u=\sqrt{N_\odot/n}\,\ell_P\approx3.9\times10^{36}\ell_P$ \\
-Emitter radius & Layout uses $R=\sqrt{n\ln2/\pi}$; the emitter radius is then set to $10^{-5}$ & $R=R_\odot/u\approx1.1\times10^7$ \\
-Box & $H_x{=}H_y{=}R_g{+}m_xR$, $H_z{=}R_g{+}m_zR$ & $H_\alpha=m_\alpha R$ \\
-Line direction & From \opt{model}: radial, Lambertian, or outward chord continuation & Interior chord $\vect s_1\to\vect s_2$; \opt{model} ignored \\
-Line ends at & Box wall (or another emitter with \opt{end-at-emitters}) & Far surface of the body (exact exit point) \\
-Segment length & \opt{seg}, default 10 & $c_\text{min}$ unless \opt{seg} is given \\
-Bending $\kappa$ & $s/g_\text{ref}$ (normalised, qualitative) & $2G_\text{eff}\ell$ (physical, GR factor 2), unless \opt{strength} \\
-Mass--length link & $G=1$: 1 unit length = 1 unit mass & $G_\text{eff}=M_\text{geo}/(\tfrac43nR)$ \\
-Boundary mass & $\tfrac12 M_\text{dep}$ & $M_\text{dep}$ (absolute $\phi$ needed) \\
-GPU read-back & $\vect g$ only & $\vect g$ and $\phi$ \\
-Line seeding hash & Double mix of $e$: independent for every emitter & $e\ll62$ (one emitter, fine) \\
-Per-line statistics & None & \texttt{ChordStats}: arc, span, deflection, Shapiro \\
-Rotation curve & About the box centre, 8 in-plane directions, $r$ from 0 & About the Sun, 14 directions (axes + diagonals), $r$ from $R$ \\
-Extra key & --- & \texttt{m}: mass measurement \\
-Extra display & --- & 600 exterior field streamlines (key \texttt{f}) \\
-\bottomrule
-\end{longtable}
-}
-
-\begin{corebox}{The essential difference in one sentence}
+\begin{corebox}{The essential difference in one sentence:}
 In \GALAXY\ mode the lines are an \emph{exterior halo}: they flow out of many
 small sources into empty space, and only the \emph{shape} of their
 self-bending matters. In \SUN\ mode the lines are the \emph{interior} of one large body,
@@ -800,7 +764,7 @@ compared quantitatively with general relativity.
          \State $g_r\mathrel{+}=\vect g(\vect q)\cdot(\vect c-\vect q)/|\vect c-\vect q|$; \quad $|g|\mathrel{+}=|\vect g(\vect q)|$; count cells
       \EndFor
    \EndFor
-   \State $\bar g_r\gets$ average; \quad $v\gets\sqrt{\bar g_r\,r}$; \quad $v_K\gets v_0\sqrt{r_0/r}$ (normalised to the first sample)
+   \State $\bar g_r\gets$ average; \quad $v\gets\sqrt{\bar g_r\,r}$; \quad $v_K\gets v_0\sqrt{r_0/r}$ (normalized to the first sample)
 \EndFor
 \State fit the slope of $\ln v$ against $\ln r$ by least squares \Comment{0 $=$ flat, $-\tfrac12=$ Keplerian}
 \State write \texttt{rotation\_curve\_step}$k$\texttt{.csv}
@@ -888,7 +852,7 @@ The potential buffer stays on the GPU between steps, so the warm start
 works there as it does in the CPU solver. The \opt{cpu} option forces the CPU path.
 
 % ==================================================================
-\section{Visualisation and interaction}
+\section{Visualization and interaction}
 % ==================================================================
 
 The renderer draws, in order: a ray-marched emission--absorption volume of the
@@ -954,7 +918,7 @@ Galaxy (many emitter) setup.
 -{}-grid & 250 & one value: cells on the longest axis (cubic cells); \texttt{x,y,z}: explicit \\
 -{}-margin & 6 & box half-size in emitter radii (beyond $D$ or $R_g$) \\
 -{}-seg & 10 & segment length $\ell$ (\SUN: cell size unless given) \\
--{}-strength & $0.1$ & normalised max turn per step (\SUN: switches off physical bending) \\
+-{}-strength & $0.1$ & normalized max turn per step (\SUN: switches off physical bending) \\
 -{}-iters & 10 & SOR sweeps per step \\
 -{}-model & quantum & \texttt{newton}, \texttt{classical} or \texttt{quantum} start directions \\
 -{}-highlight & 0.25 & highlighted-line density / probability \\
