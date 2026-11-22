@@ -63,7 +63,7 @@ is solved for the potential, and the resulting gravitational acceleration
 bends the same lines in the next step. The field therefore acts back on the
 lines that produce it: gravity is \emph{self-interacting}. The program offers
 four modes. This document concentrates on the self-interaction loop and on
-the two modes that differ most, \GALAXY\ (many emitters, normalized bending, rotation curves)
+the two modes that differ most, \GALAXY\ (many emitters, normalized bending, flat rotation curves)
 and \SUN\ (one body at physical scale, interior chords, physical bending and
 mass measurement). All procedures are given as algorithms rather than source code.
 \end{abstract}
@@ -159,8 +159,7 @@ floats. The direction uses \emph{octahedral encoding}, compressed to two signed
 \end{algorithm}
 
 The angular resolution is about $3\times10^{-5}$\,rad, which is far finer than
-the per-step bending angles in all modes except \SUN\ (see
-Section~\ref{sec:remarks}).
+the per-step bending angles in all modes except \SUN.
 
 \subsection{Line-major node store}
 
@@ -410,7 +409,7 @@ the density itself changes slowly. With the field solved this way, line growth,
 bending and potential relaxation converge together towards a self-consistent
 state.
 
-\begin{corebox}{Why this is self-interacting gravity}
+\begin{corebox}{Why this is self-interacting gravity: }
 The lines are the \emph{only} source term ($\rho$ comes from line segments alone)
 and also the \emph{only} thing that responds to the field. No external potential
 is imposed apart from the monopole boundary condition, and that is itself
@@ -531,7 +530,7 @@ a truncated exponential disk with logarithmic spiral arms.
 \caption{\textsc{BuildGalaxy} --- deterministic spiral layout}
 \label{alg:galaxy}
 \begin{algorithmic}[1]
-\State $R\gets10^{-5}$ \Comment{emitter radius is overridden here (see Section~\ref{sec:remarks})}
+\State $R\gets10^{-5}$ \Comment{emitter radius is overridden here}
 \State $h_s\gets R_g/3$; \quad pitch $\psi\gets0.3$; \quad $r_0\gets2R$; \quad $d_\text{min}\gets2.5R$
 \State seed the hash with a fixed constant
 \While{fewer than $N_\text{want}$ placed \textbf{and} attempts $<5000\,N_\text{want}$}
