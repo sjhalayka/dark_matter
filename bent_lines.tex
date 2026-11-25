@@ -929,12 +929,26 @@ The following data are produced by pressing the `r' key:
 \item For \SINGLE\ mode, the falloff exponent is +0.0084.
 \item For \SUN\ mode, the falloff exponent is -0.5175.
 \end{itemize}
+
 The following datum is produced by pressing the `m' key:
 \begin{itemize}
 \item For \SUN\ mode, the deposited line mass is equal to 0.990245 times the Sun's mass.
 \end{itemize}
-
-
+Note that we can also produce the chord length sum and mass of the Sun analytically, for large $n$.
+The chord length sum is
+%\begin{equation}
+%  \Sigma \approx \frac{4}{3} \left( \frac{4\pi}{\ln 2} \right)^{2} M^{5},
+%\end{equation}
+\begin{equation}
+  \Sigma = \frac{n(n-1)}{2} \cdot \frac{4R}{3}
+         = \frac{2}{3}\, n(n-1)\, R
+         = \frac{4}{3}\, n(n-1)\, M,
+\end{equation}
+and the mass is
+\begin{equation}
+% M \approx \left( \frac{3 (\ln 2)^2\, \Sigma}{64 \pi^2} \right)^{1/5}.
+M = \frac{3\,\Sigma}{4\, n(n-1)}.
+\end{equation}
 
 
 \section{Conclusion}
